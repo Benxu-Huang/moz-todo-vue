@@ -1,12 +1,20 @@
 <template>
   <div id="app">
     <h1>To-Do List</h1>
+
     <to-do-form @todo-added="addToDo"></to-do-form>
-    <h2 id="list-summary">{{listSummary}}</h2>
+
+    <h2 id="list-summary">{{ listSummary }}</h2>
+
     <ul qria-labelledby="list-summary" class="stack-large">
       <li v-for="item in ToDoItems" :key="item.id">
-        <to-do-item :label="item.label" :done="item.done" :id="item.id"
-                    @checkbox-changed="updateDoneStatus(item.id)"
+        <to-do-item
+          :label="item.label"
+          :done="item.done"
+          :id="item.id"
+          @checkbox-changed="updateDoneStatus(item.id)"
+          @item-deleted="deleteToDo(item.id)"
+          @item-edited="editToDo(item.id, $event)"
         ></to-do-item>
       </li>
     </ul>
@@ -14,42 +22,55 @@
 </template>
 
 <script>
-import ToDoItem from './components/ToDoItem'
-import ToDoForm from './components/ToDoForm'
-import uniqueId from 'lodash.uniqueid';
+import ToDoItem from "./components/ToDoItem";
+import ToDoForm from "./components/ToDoForm";
+import uniqueId from "lodash.uniqueid";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
     ToDoItem,
-    ToDoForm
+    ToDoForm,
   },
   data() {
     return {
-      ToDoItems:[
-        {id: uniqueId('todo-'), label: 'Learn Vue', done: false},
-        {id: uniqueId('todo-'), label: 'Create a Vue project with the CLI', done: true},
-        {id: uniqueId('todo-'), label: 'Have fun', done: true},
-        {id: uniqueId('todo-'), label: 'Create a to do list', done: false}
-      ]
+      ToDoItems: [
+        { id: uniqueId("todo-"), label: "Learn Vue", done: false },
+        {
+          id: uniqueId("todo-"),
+          label: "Create a Vue project with the CLI",
+          done: true,
+        },
+        { id: uniqueId("todo-"), label: "Have fun", done: true },
+        { id: uniqueId("todo-"), label: "Create a to do list", done: false },
+      ],
     };
   },
-  methods:{
-    addToDo(toDoLabel){
-      this.ToDoItems.push({id:uniqueId('todo-'),label:toDoLabel,done:false})
+  methods: {
+    addToDo(toDoLabel) {
+      this.ToDoItems.push({
+        id: uniqueId("todo-"),
+        label: toDoLabel,
+        done: false,
+      });
     },
     updateDoneStatus(toDoId) {
-      const toDoToUpdate = this.ToDoItems.find(item=>item.id === toDoId)
-      toDoToUpdate.done = !toDoToUpdate.done
-    }
+      const toDoToUpdate = this.ToDoItems.find((item) => item.id === toDoId);
+      toDoToUpdate.done = !toDoToUpdate.done;
+    },
+    deleteToDo(toDoId) {
+      const itemIndex = this.ToDoItems.find((item) => item.id === toDoId);
+      this.ToDoItems.splice(itemIndex, 1);
+    },
   },
-  computed:{
-    listSummary(){
-      const numberFinishedItems = this.ToDoItems.filter(item=>item.done).length
-      return `${numberFinishedItems} out of ${this.ToDoItems.length} items completed`
-    }
-  }
-}
+  computed: {
+    listSummary() {
+      const numberFinishedItems = this.ToDoItems.filter((item) => item.done)
+        .length;
+      return `${numberFinishedItems} out of ${this.ToDoItems.length} items completed`;
+    },
+  },
+};
 </script>
 
 <style>
